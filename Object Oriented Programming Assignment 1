@@ -1,0 +1,97 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+// Struct to represent a person
+typedef struct {
+    char name[50];
+} Person;
+
+// Struct to represent a baby
+typedef struct {
+    char name[50];
+    bool isStepChild;
+    char parents[2][50];
+} Baby;
+
+// Struct to represent a married couple
+typedef struct {
+    Person partner1;
+    Person partner2;
+    Baby children[10]; // Assume a max of 10 children for simplicity
+    int childCount;
+} MarriedCouple;
+
+// Function to check if a couple has kids
+bool hasKids(MarriedCouple *couple) {
+    return couple->childCount > 0;
+}
+
+// Function to adopt a child
+void adoptKid(MarriedCouple *couple, char *babyName, bool isStepChild) {
+    if (couple->childCount >= 10) {
+        printf("Cannot adopt more kids. Maximum limit reached.\n");
+        return;
+    }
+
+    Baby newBaby;
+    strcpy(newBaby.name, babyName);
+    newBaby.isStepChild = isStepChild;
+    strcpy(newBaby.parents[0], couple->partner1.name);
+    strcpy(newBaby.parents[1], couple->partner2.name);
+
+    couple->children[couple->childCount] = newBaby;
+    couple->childCount++;
+
+    printf("%s has been adopted by %s and %s.\n", babyName, couple->partner1.name, couple->partner2.name);
+}
+
+// Function to get parents of a baby
+void getParents(MarriedCouple *couple, char *babyName) {
+    for (int i = 0; i < couple->childCount; i++) {
+        if (strcmp(couple->children[i].name, babyName) == 0) {
+            printf("Parents of %s: %s and %s\n", babyName, couple->children[i].parents[0], couple->children[i].parents[1]);
+            return;
+        }
+    }
+    printf("Baby %s not found.\n", babyName);
+}
+
+// Function to check if a baby is a stepchild
+void isStepChild(MarriedCouple *couple, char *babyName) {
+    for (int i = 0; i < couple->childCount; i++) {
+        if (strcmp(couple->children[i].name, babyName) == 0) {
+            printf("Is %s a stepchild? %s\n", babyName, couple->children[i].isStepChild ? "Yes" : "No");
+            return;
+        }
+    }
+    printf("Baby %s not found.\n", babyName);
+}
+
+int main() {
+    // Create a married couple
+    MarriedCouple couple;
+    strcpy(couple.partner1.name, "John");
+    strcpy(couple.partner2.name, "Jane");
+    couple.childCount = 0;
+
+    // Check if they have kids
+    printf("Has kids: %s\n", hasKids(&couple) ? "Yes" : "No");
+
+    // Adopt a child
+    adoptKid(&couple, "Ella", false);
+
+    // Check if they have kids now
+    printf("Has kids: %s\n", hasKids(&couple) ? "Yes" : "No");
+
+    // Adopt a stepchild
+    adoptKid(&couple, "Liam", true);
+
+    // Get parents of a baby
+    getParents(&couple, "Ella");
+
+    // Check if a baby is a stepchild
+    isStepChild(&couple, "Liam");
+
+    return 0;
+}
